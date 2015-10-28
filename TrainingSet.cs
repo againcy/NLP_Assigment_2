@@ -25,9 +25,10 @@ namespace NLP_Assigment_2
             //countHead = new Dictionary<string, int>();
             segmenter = new JiebaSegmenter();
             trie = new WordDictionary();
-
+            Console.WriteLine(System.DateTime.Now.ToString() + "词库加载完毕，开始加载训练集...");
             LoadTrainingSet();
             OutputDictionary();
+            Console.WriteLine(System.DateTime.Now.ToString() + "训练集加载完毕...");
         }
 
         /// <summary>
@@ -35,78 +36,81 @@ namespace NLP_Assigment_2
         /// </summary>
         private void LoadTrainingSet()
         {
-            StreamReader sr = new StreamReader("Training.txt",Encoding.UTF8);
-            string line;
-            while ((line = sr.ReadLine())!=null)
+            foreach (var file in Directory.GetFiles(@".\Training\"))
             {
-                foreach(var block in regexChinese.Split(line))
+                StreamReader sr = new StreamReader(file);
+                string line;
+                while ((line = sr.ReadLine()) != null)
                 {
-                    if (regexChinese.IsMatch(block)==false) continue;
-                    var words = segmenter.Cut(block);
-                    if (words == null || words.Count() == 0) continue;
-                    string prev = null;
-                    foreach (string word in words)
+                    foreach (var block in regexChinese.Split(line))
                     {
-                        if (trie.AddWord(word) == false) break;
-                        if (prev != null)
+                        if (regexChinese.IsMatch(block) == false) continue;
+                        var words = segmenter.Cut(block);
+                        if (words == null || words.Count() == 0) continue;
+                        string prev = null;
+                        foreach (string word in words)
                         {
-                            #region 根据词本身计数
-                            if (countWordGroup.ContainsKey(prev) == true)
+                            if (trie.AddWord(word) == false) break;
+                            if (prev != null)
                             {
-                                //已经出现过word1
-                                if (countWordGroup[prev].ContainsKey(word) == true)
+                                #region 根据词本身计数
+                                if (countWordGroup.ContainsKey(prev) == true)
                                 {
-                                    //词组word1,word2计数++
-                                    countWordGroup[prev][word]++;
-                                }
-                                else
-                                {
-                                    //添加词组word1,word2
-                                    countWordGroup[prev].Add(word, 1);
-                                }
-                            }
-                            else
-                            {
-                                //直接添加新的词组word1,word2
-                                countWordGroup.Add(prev, new Dictionary<string, int>());
-                                countWordGroup[prev].Add(word, 1);
-                            }
-
-                            #endregion
-
-                            #region 根据词性计数
-                            string c_prev = trie.GetCharacteristic(prev);
-                            string c_word = trie.GetCharacteristic(word);
-                            if (c_prev != null && c_word != null)
-                            {
-                                if (countCharacterGroup.ContainsKey(c_prev) == true)
-                                {
-                                    //已经出现过c_prev
-                                    if (countCharacterGroup[c_prev].ContainsKey(c_word) == true)
+                                    //已经出现过word1
+                                    if (countWordGroup[prev].ContainsKey(word) == true)
                                     {
-                                        //c_prev,c_word计数++
-                                        countCharacterGroup[c_prev][c_word]++;
+                                        //词组word1,word2计数++
+                                        countWordGroup[prev][word]++;
                                     }
                                     else
                                     {
                                         //添加词组word1,word2
-                                        countCharacterGroup[c_prev].Add(c_word, 1);
+                                        countWordGroup[prev].Add(word, 1);
                                     }
                                 }
                                 else
                                 {
                                     //直接添加新的词组word1,word2
-                                    countCharacterGroup.Add(c_prev, new Dictionary<string, int>());
-                                    countCharacterGroup[c_prev].Add(c_word, 1);
+                                    countWordGroup.Add(prev, new Dictionary<string, int>());
+                                    countWordGroup[prev].Add(word, 1);
+                                }
+
+                                #endregion
+
+                                #region 根据词性计数
+                                string c_prev = trie.GetCharacteristic(prev);
+                                string c_word = trie.GetCharacteristic(word);
+                                if (c_prev != null && c_word != null)
+                                {
+                                    if (countCharacterGroup.ContainsKey(c_prev) == true)
+                                    {
+                                        //已经出现过c_prev
+                                        if (countCharacterGroup[c_prev].ContainsKey(c_word) == true)
+                                        {
+                                            //c_prev,c_word计数++
+                                            countCharacterGroup[c_prev][c_word]++;
+                                        }
+                                        else
+                                        {
+                                            //添加词组word1,word2
+                                            countCharacterGroup[c_prev].Add(c_word, 1);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //直接添加新的词组word1,word2
+                                        countCharacterGroup.Add(c_prev, new Dictionary<string, int>());
+                                        countCharacterGroup[c_prev].Add(c_word, 1);
+                                    }
                                 }
                             }
+                                #endregion
+                            prev = word;
                         }
-                        #endregion
-                        prev = word;
                     }
                 }
+                sr.Close();
             }
-            sr.Close();
         }
 
         public void OutputDictionary()
@@ -114,7 +118,7 @@ namespace NLP_Assigment_2
             StreamWriter sw = new StreamWriter("Words.txt");
             foreach (var word in trie.GetAllWords())
             {
-                sw.WriteLine(word);
+                if (trie.GetWordCount(word) > 0) sw.WriteLine(word);
             }
             sw.Close();
 
@@ -162,12 +166,22 @@ namespace NLP_Assigment_2
             string c1 = trie.GetCharacteristic(word1);
             string c2 = trie.GetCharacteristic(word2);
             if (c1 == null || c2 == null) return 0;
-            
+            if (countCharacterGroup.ContainsKey(c1) == false || countCharacterGroup[c1].ContainsKey(c2) == false) return 0;
             int cnt1 = countCharacterGroup[c1][c2];
             int cnt2 = trie.GetCharacteristicCount(c1);
             return (double)cnt1 / (double)cnt2;
-                
-            
+        }
+
+        /// <summary>
+        /// 获取一个词性出现的次数
+        /// </summary>
+        /// <param name="word">词</param>
+        /// <returns>词对应的词性出现的次数</returns>
+        public double GetProbability_C(string word)
+        {
+            string c = trie.GetCharacteristic(word);
+            if (c == null) return 0;
+            else return trie.GetCharacteristicCount(c);
         }
     }
 }

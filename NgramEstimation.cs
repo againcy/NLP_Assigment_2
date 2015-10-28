@@ -33,7 +33,7 @@ namespace NLP_Assigment_2
             while ((order = orderGenerator.GetNext()) != null)
             {
                 //生成词组的全排列，并做N-gram参数估计
-                double p = 1;
+                double p = (double)trainingSet.GetProbability_C(words[order[0]])/(double)trainingSet.trie.Total;
                 for (int i = 1; i < count; i++)
                 {
                     double tmp = trainingSet.GetProbability_C(words[order[i - 1]], words[order[i]]);
@@ -55,7 +55,7 @@ namespace NLP_Assigment_2
             int[] orderBest = new int[count];
             foreach(var o in orderCandi)
             {
-                double p = 1;
+                double p = (double)trainingSet.GetProbability(words[o[0]]) / (double)trainingSet.trie.Total;
                 for (int i = 1; i < count; i++)
                 {
                     double tmp = trainingSet.GetProbability(words[o[i - 1]], words[o[i]]);
@@ -74,6 +74,7 @@ namespace NLP_Assigment_2
 
         public string Estimate(string[] words)
         {
+            Console.WriteLine(System.DateTime.Now.ToString() + "开始计算成句概率...");
             int count = words.Count();
             orderGenerator = new FullPermutation(count);
             int[] order;
@@ -85,7 +86,7 @@ namespace NLP_Assigment_2
                 //生成词组的全排列，并做N-gram参数估计
                 //double p=trainingSet.GetProbability(words[0]);
                 //if (p == 0) continue;
-                double p = 1;
+                double p =(double) trainingSet.GetProbability(words[order[0]])/(double)trainingSet.trie.Total;
                 for(int i = 1;i<count;i++)
                 {
                     double tmp = trainingSet.GetProbability(words[order[i - 1]], words[order[i]]);
@@ -98,16 +99,19 @@ namespace NLP_Assigment_2
                     pMax = p;
                 }
             }
+            string result;
             if (pMax == 0)
-            {
-                return EstimateWithCharacteristic(words);
+            { 
+                result = EstimateWithCharacteristic(words);
             }
             else
             {
-                string result = "";
+                result = "";
                 for (int i = 0; i < count; i++) result += words[orderBest[i]];
-                return result;
+                
             }
+            Console.WriteLine(System.DateTime.Now.ToString() + "计算完毕...");
+            return result;
         }
     }
 }

@@ -8,3 +8,10 @@ c:\users\liuyibin\documents\visual studio 2015\Projects\NLP_Assigment_2\NLP_Assi
 c:\users\liuyibin\documents\visual studio 2015\Projects\NLP_Assigment_2\NLP_Assigment_2\obj\Debug\NLP_Assigment_2.csprojResolveAssemblyReference.cache
 c:\users\liuyibin\documents\visual studio 2015\Projects\NLP_Assigment_2\NLP_Assigment_2\obj\Debug\NLP_Assigment_2.exe
 c:\users\liuyibin\documents\visual studio 2015\Projects\NLP_Assigment_2\NLP_Assigment_2\obj\Debug\NLP_Assigment_2.pdb
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\bin\Debug\NLP_Assigment_2.exe.config
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\obj\Debug\NLP_Assigment_2.exe
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\obj\Debug\NLP_Assigment_2.pdb
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\bin\Debug\NLP_Assigment_2.exe
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\bin\Debug\NLP_Assigment_2.pdb
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\LiuYibin\Documents\Visual Studio 2012\Projects\NLP_Assigment_2\obj\Debug\NLP_Assigment_2.csprojResolveAssemblyReference.cache
